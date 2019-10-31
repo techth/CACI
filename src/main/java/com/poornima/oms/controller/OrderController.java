@@ -1,95 +1,43 @@
-package com.poornima.oms.business;
+package com.poornima.oms.controller;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-@Service
-public class OrderService {
+import com.poornima.oms.business.Order;
+import com.poornima.oms.business.OrderService;
 
-	private static List<Order> orders = new ArrayList<>();
+@RestController
+public class OrderController {
 
-	private static int ordersCount = 3;
-	static {
-		orders.add(new Order(1, "bricks", 20, false, 3));
-		orders.add(new Order(2, "bricks", 20, false, 3));
-		orders.add(new Order(3, "bricks", 20, false, 3));
+	@Autowired
+	private OrderService orderService;
 
+	@RequestMapping("/getOrder/{id}")
+	public Order getOrder(@PathVariable int id) {
+		return orderService.retrieveOrder(id);
 	}
 
-	/**
-	 * Retrieve all the orders
-	 * 
-	 * @return
-	 */
+	@RequestMapping("/retrieveOrders")
 	public List<Order> retrieveOrders() {
-		return orders;
+		return orderService.retrieveOrders();
 	}
 
-	/**
-	 * Get a specific order
-	 * 
-	 * @param id
-	 * @return
-	 */
-	public Order retrieveOrder(int id) {
-
-		for (Order order : orders) {
-			if (order.getId() == id) {
-				return order;
-			}
-		}
-		return null;
+	@RequestMapping("/createOrder/{numberOfBricks}")
+	public void createOrder(@PathVariable int numberOfBricks) {
+		orderService.createOrder(numberOfBricks);
 	}
 
-	/**
-	 * Create order
-	 * 
-	 * @param noOfBricks
-	 */
-	public void createOrder(int noOfBricks) {
-
-		orders.add(new Order(++ordersCount, "bricks", 20, false, noOfBricks));
+	@RequestMapping("/updateOrder/{id}/{numberOfBricks}")
+	public Order updateOrder(@PathVariable int id, @PathVariable int numberOfBricks) {
+		return orderService.updateOrder(id, numberOfBricks);
 	}
 
-	/**
-	 * Update the numberOfBricks for an existing order and return a new order
-	 * reference ID
-	 *
-	 * @param numberOfBricks
-	 * @param iD
-	 * @return
-	 */
-	public Order updateOrder(int iD, int numberOfBricks) {
-
-		for (Order order : orders) {
-			if (order.getId() == iD) {
-				System.out.println("IDs are equal");
-				if (order.getIsDispatched() == false) {
-					System.out.println("getIsDispatched() == false");
-					order.setNoOfBricks(numberOfBricks);
-					order.setId(++ordersCount); // a unique updated reference is
-												// set to the order
-					return order;
-				}
-			}
-		}
-		return null;
+	@RequestMapping("/fulfillOrder/{id}")
+	public void fullfillOrder(@PathVariable int id) {
+		orderService.fullfillOrder(id);
 	}
-
-	/**
-	 * when there is a request to fullfill a particular order, with reference
-	 * number, should set isDispatched is equal to true
-	 * 
-	 * @param id
-	 */
-	public void fullfillOrder(int id) {
-		for (Order order : orders) {
-			if (order.getId() == id) {
-				order.setIsDispatched(Boolean.TRUE);
-			}
-		}
-	}
-
 }
